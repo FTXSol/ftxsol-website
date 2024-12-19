@@ -94,13 +94,13 @@
 
         let bird, pipes, gameSpeed, gravity, lift, gameOver, score;
         const birdImage = new Image();
-        birdImage.src = 'assets/images/pixelated-baby-phoenix.png'; // Update this path with the generated image
+        birdImage.src = 'assets/images/pixelated-baby-phoenix.png'; // Ensure this path is correct
 
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 20;
-            this.height = 20;
+            this.width = 40; // Adjusted width for phoenix image
+            this.height = 40; // Adjusted height for phoenix image
             this.velocity = 0;
             this.lift = -4;
             this.gravity = 0.2;
@@ -134,14 +134,14 @@
             this.update = function() {
                 this.x -= gameSpeed;
                 if (this.x + this.width < 0) {
-                    pipes.shift(); // Remove passed pipes
+                    pipes.shift();
                 }
             };
 
             this.render = function() {
                 ctx.fillStyle = '#008000';
-                ctx.fillRect(this.x, 0, this.width, this.height); // top pipe
-                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap)); // bottom pipe
+                ctx.fillRect(this.x, 0, this.width, this.height); // Top pipe
+                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap)); // Bottom pipe
             };
         }
 
