@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$FTXSOL - The Comeback Meme Coin</title>
+    <title>#FTXSol Bird</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <style>
         body, html {
@@ -33,26 +33,28 @@
         }
 
         .game-over {
-            color: white;
-            font-size: 50px;
-            text-align: center;
             position: absolute;
-            top: 40%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-family: 'Arial', sans-serif;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
         }
 
-        .btn {
+        .restart-btn {
             padding: 10px 20px;
-            margin: 10px;
             background-color: #007bff;
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            border: none;
+            cursor: pointer;
         }
 
         #game {
+            position: relative;
             text-align: center;
             margin-top: 20px;
         }
@@ -79,7 +81,10 @@
     <section id="game">
         <h2>Play #FTXSol Bird!</h2>
         <canvas id="gameCanvas"></canvas>
-        <div class="game-over" id="gameOverMessage" style="display:none;">Game Over! Press R to Restart</div>
+        <div class="game-over" id="gameOverContainer">
+            <h2>Game Over!</h2>
+            <button class="restart-btn" onclick="startGame()">Restart</button>
+        </div>
     </section>
 
     <footer>
@@ -94,18 +99,24 @@
 
         let bird, pipes, gameSpeed, gravity, lift, gameOver, score;
         const birdImage = new Image();
-        birdImage.src = 'assets/images/pixelated-baby-phoenix.png'; // Ensure this path is correct
+        birdImage.src = 'assets/images/pixelated-baby-phoenix-sprite.png'; // Sprite sheet for the phoenix
 
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 40; // Adjusted width for phoenix image
-            this.height = 40; // Adjusted height for phoenix image
+            this.width = 32; // Frame width from sprite sheet
+            this.height = 32; // Frame height from sprite sheet
             this.velocity = 0;
             this.lift = -4;
             this.gravity = 0.2;
 
-            this.update = function() {
+            // Animation properties
+            this.frame = 0; // Current frame
+            this.frameCount = 3; // Total number of frames
+            this.frameInterval = 6; // Frames per animation update
+            this.tick = 0; // Track time for frame changes
+
+            this.update = function () {
                 this.velocity += this.gravity;
                 this.y += this.velocity;
 
@@ -114,14 +125,31 @@
                     this.y = canvas.height - this.height;
                     gameOver = true;
                 }
+
+                // Update animation frame
+                this.tick++;
+                if (this.tick >= this.frameInterval) {
+                    this.frame = (this.frame + 1) % this.frameCount;
+                    this.tick = 0;
+                }
             };
 
-            this.jump = function() {
+            this.jump = function () {
                 this.velocity = this.lift;
             };
 
-            this.render = function() {
-                ctx.drawImage(birdImage, this.x, this.y, this.width, this.height);
+            this.render = function () {
+                ctx.drawImage(
+                    birdImage,
+                    this.frame * this.width, // Source X: frame index * frame width
+                    0, // Source Y: always 0 for horizontal sprite sheet
+                    this.width, // Source width
+                    this.height, // Source height
+                    this.x, // Destination X
+                    this.y, // Destination Y
+                    this.width, // Destination width
+                    this.height // Destination height
+                );
             };
         }
 
@@ -131,17 +159,18 @@
             this.x = canvas.width;
             this.height = Math.floor(Math.random() * (canvas.height - this.gap));
 
-            this.update = function() {
+            this.update = function () {
                 this.x -= gameSpeed;
                 if (this.x + this.width < 0) {
-                    pipes.shift();
+                    pipes.shift(); // Remove passed pipes
+                    score++;
                 }
             };
 
-            this.render = function() {
+            this.render = function () {
                 ctx.fillStyle = '#008000';
-                ctx.fillRect(this.x, 0, this.width, this.height); // Top pipe
-                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap)); // Bottom pipe
+                ctx.fillRect(this.x, 0, this.width, this.height); // top pipe
+                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap)); // bottom pipe
             };
         }
 
@@ -153,13 +182,13 @@
             lift = -4;
             gameOver = false;
             score = 0;
-            document.getElementById('gameOverMessage').style.display = 'none';
+            document.getElementById('gameOverContainer').style.display = 'none';
             gameLoop();
         }
 
         function gameLoop() {
             if (gameOver) {
-                document.getElementById('gameOverMessage').style.display = 'block';
+                document.getElementById('gameOverContainer').style.display = 'flex';
                 return;
             }
 
@@ -189,16 +218,13 @@
             requestAnimationFrame(gameLoop);
         }
 
-        canvas.addEventListener('click', function() {
+        canvas.addEventListener('click', function () {
             if (!gameOver) bird.jump();
         });
 
-        window.addEventListener('keydown', function(event) {
+        window.addEventListener('keydown', function (event) {
             if (event.code === 'Space' && !gameOver) {
                 bird.jump();
-            }
-            if (event.code === 'KeyR' && gameOver) {
-                startGame();
             }
         });
 
