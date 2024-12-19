@@ -21,10 +21,10 @@
             background-color: #fff;
         }
 
-        header {
+        header, footer {
             text-align: center;
             padding: 20px;
-            background-color: #333;
+            background-color: #70c5ce;
             color: white;
         }
 
@@ -52,14 +52,6 @@
             border-radius: 5px;
         }
 
-        footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-        }
-
-        /* Specific styling for the game section */
         #game {
             text-align: center;
             margin-top: 20px;
@@ -68,7 +60,7 @@
 </head>
 <body>
     <header>
-        <h1>$FTXSOL</h1>
+        <h1>#FTXSol Bird</h1>
         <p>"Pump it, don’t dump it!"</p>
     </header>
 
@@ -84,9 +76,8 @@
         <a href="https://x.com/ftxsol_?s=21&t=i7a15TmSrjZUgzU8gYwxxg" target="_blank" class="btn">X</a>
     </section>
 
-    <!-- Flappy Bird Game Section -->
     <section id="game">
-        <h2>Play Flappy Bird!</h2>
+        <h2>Play #FTXSol Bird!</h2>
         <canvas id="gameCanvas"></canvas>
         <div class="game-over" id="gameOverMessage" style="display:none;">Game Over! Press R to Restart</div>
     </section>
@@ -95,7 +86,6 @@
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
 
-    <!-- Game Script -->
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -103,6 +93,8 @@
         canvas.height = 480;
 
         let bird, pipes, gameSpeed, gravity, lift, gameOver, score;
+        const birdImage = new Image();
+        birdImage.src = 'assets/images/pixelated-baby-phoenix.png'; // Update this path with the generated image
 
         function Bird() {
             this.x = 50;
@@ -129,8 +121,7 @@
             };
 
             this.render = function() {
-                ctx.fillStyle = '#ff0';
-                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.drawImage(birdImage, this.x, this.y, this.width, this.height);
             };
         }
 
@@ -167,20 +158,20 @@
         }
 
         function gameLoop() {
-            if (gameOver) return;
+            if (gameOver) {
+                document.getElementById('gameOverMessage').style.display = 'block';
+                return;
+            }
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Update bird and pipes
             bird.update();
             bird.render();
 
-            // Create new pipes
             if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
                 pipes.push(new Pipe());
             }
 
-            // Update pipes and render them
             for (let i = 0; i < pipes.length; i++) {
                 pipes[i].update();
                 pipes[i].render();
@@ -191,20 +182,16 @@
                 }
             }
 
-            // Score logic
-            for (let i = 0; i < pipes.length; i++) {
-                if (pipes[i].x + pipes[i].width === bird.x) {
-                    score++;
-                }
-            }
-
-            // Display score
             ctx.fillStyle = 'black';
             ctx.font = '20px Arial';
             ctx.fillText('Score: ' + score, 10, 30);
 
             requestAnimationFrame(gameLoop);
         }
+
+        canvas.addEventListener('click', function() {
+            if (!gameOver) bird.jump();
+        });
 
         window.addEventListener('keydown', function(event) {
             if (event.code === 'Space' && !gameOver) {
