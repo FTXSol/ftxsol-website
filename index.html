@@ -32,6 +32,17 @@
             padding: 20px;
         }
 
+        #game {
+            position: relative;
+            text-align: center;
+            margin: 20px auto;
+            width: 320px; /* Match the canvas width */
+            height: 480px; /* Match the canvas height */
+            background-color: #fff;
+            border: 2px solid #007bff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
         .game-over {
             position: absolute;
             top: 50%;
@@ -41,6 +52,10 @@
             flex-direction: column;
             align-items: center;
             z-index: 10;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
         }
 
         .restart-btn {
@@ -51,12 +66,7 @@
             border-radius: 5px;
             border: none;
             cursor: pointer;
-        }
-
-        #game {
-            position: relative;
-            text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -80,11 +90,11 @@
 
     <section id="game">
         <h2>Play #FTXSol Bird!</h2>
-        <canvas id="gameCanvas"></canvas>
-        <div class="game-over" id="gameOverContainer">
+        <div id="gameOverContainer" class="game-over">
             <h2>Game Over!</h2>
             <button class="restart-btn" onclick="startGame()">Restart</button>
         </div>
+        <canvas id="gameCanvas"></canvas>
     </section>
 
     <footer>
@@ -99,7 +109,7 @@
 
         let bird, pipes, gameSpeed, gravity, lift, gameOver, score;
         const birdImage = new Image();
-        birdImage.src = 'assets/images/pixelated-baby-phoenix-sprite.png'; // Sprite sheet for the phoenix
+        birdImage.src = 'assets/images/pixelated-baby-phoenix-sprite.png'; // Sprite sheet for phoenix
 
         function Bird() {
             this.x = 50;
@@ -110,11 +120,10 @@
             this.lift = -4;
             this.gravity = 0.2;
 
-            // Animation properties
-            this.frame = 0; // Current frame
-            this.frameCount = 3; // Total number of frames
-            this.frameInterval = 6; // Frames per animation update
-            this.tick = 0; // Track time for frame changes
+            this.frame = 0;
+            this.frameCount = 3;
+            this.frameInterval = 6;
+            this.tick = 0;
 
             this.update = function () {
                 this.velocity += this.gravity;
@@ -126,7 +135,6 @@
                     gameOver = true;
                 }
 
-                // Update animation frame
                 this.tick++;
                 if (this.tick >= this.frameInterval) {
                     this.frame = (this.frame + 1) % this.frameCount;
@@ -141,14 +149,14 @@
             this.render = function () {
                 ctx.drawImage(
                     birdImage,
-                    this.frame * this.width, // Source X: frame index * frame width
-                    0, // Source Y: always 0 for horizontal sprite sheet
-                    this.width, // Source width
-                    this.height, // Source height
-                    this.x, // Destination X
-                    this.y, // Destination Y
-                    this.width, // Destination width
-                    this.height // Destination height
+                    this.frame * this.width,
+                    0,
+                    this.width,
+                    this.height,
+                    this.x,
+                    this.y,
+                    this.width,
+                    this.height
                 );
             };
         }
@@ -162,15 +170,15 @@
             this.update = function () {
                 this.x -= gameSpeed;
                 if (this.x + this.width < 0) {
-                    pipes.shift(); // Remove passed pipes
+                    pipes.shift();
                     score++;
                 }
             };
 
             this.render = function () {
                 ctx.fillStyle = '#008000';
-                ctx.fillRect(this.x, 0, this.width, this.height); // top pipe
-                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap)); // bottom pipe
+                ctx.fillRect(this.x, 0, this.width, this.height);
+                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap));
             };
         }
 
