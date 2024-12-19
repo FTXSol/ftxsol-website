@@ -5,6 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$FTXSOL - The Comeback Meme Coin</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background-color: #70c5ce;
+            font-family: 'Arial', sans-serif;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        .game-over {
+            color: white;
+            font-size: 50px;
+            text-align: center;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -16,7 +70,6 @@
         <h2>About $FTXSOL</h2>
         <img src="assets/images/ftxsollogoremove.png" alt="Token Logo" width="350" height="350" />
         <p>$FTXSOL is a meme coin built on Solana, symbolizing resilience and recovery in the crypto world. Join the movement and be part of the comeback story!</p>
-        
     </section>
 
     <section id="community">
@@ -25,8 +78,137 @@
         <a href="https://x.com/ftxsol_?s=21&t=i7a15TmSrjZUgzU8gYwxxg" target="_blank" class="btn">X</a>
     </section>
 
+    <!-- Flappy Bird Game Section -->
+    <section id="game">
+        <h2>Play Flappy Bird!</h2>
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-over" id="gameOverMessage" style="display:none;">Game Over! Press R to Restart</div>
+    </section>
+
     <footer>
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 320;
+        canvas.height = 480;
+
+        let bird, pipes, gameSpeed, gravity, lift, gameOver, score;
+
+        function Bird() {
+            this.x = 50;
+            this.y = canvas.height / 2;
+            this.width = 20;
+            this.height = 20;
+            this.velocity = 0;
+            this.lift = -4;
+            this.gravity = 0.2;
+
+            this.update = function() {
+                this.velocity += this.gravity;
+                this.y += this.velocity;
+
+                if (this.y < 0) this.y = 0;
+                if (this.y + this.height > canvas.height) {
+                    this.y = canvas.height - this.height;
+                    gameOver = true;
+                }
+            };
+
+            this.jump = function() {
+                this.velocity = this.lift;
+            };
+
+            this.render = function() {
+                ctx.fillStyle = '#ff0';
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            };
+        }
+
+        function Pipe() {
+            this.width = 40;
+            this.gap = 120;
+            this.x = canvas.width;
+            this.height = Math.floor(Math.random() * (canvas.height - this.gap));
+
+            this.update = function() {
+                this.x -= gameSpeed;
+                if (this.x + this.width < 0) {
+                    pipes.shift(); // Remove passed pipes
+                }
+            };
+
+            this.render = function() {
+                ctx.fillStyle = '#008000';
+                ctx.fillRect(this.x, 0, this.width, this.height); // top pipe
+                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap)); // bottom pipe
+            };
+        }
+
+        function startGame() {
+            bird = new Bird();
+            pipes = [];
+            gameSpeed = 2;
+            gravity = 0.2;
+            lift = -4;
+            gameOver = false;
+            score = 0;
+            document.getElementById('gameOverMessage').style.display = 'none';
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if (gameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Update bird and pipes
+            bird.update();
+            bird.render();
+
+            // Create new pipes
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
+                pipes.push(new Pipe());
+            }
+
+            // Update pipes and render them
+            for (let i = 0; i < pipes.length; i++) {
+                pipes[i].update();
+                pipes[i].render();
+                if (pipes[i].x <= bird.x + bird.width && pipes[i].x + pipes[i].width > bird.x) {
+                    if (bird.y < pipes[i].height || bird.y + bird.height > pipes[i].height + pipes[i].gap) {
+                        gameOver = true;
+                    }
+                }
+            }
+
+            // Score logic
+            for (let i = 0; i < pipes.length; i++) {
+                if (pipes[i].x + pipes[i].width === bird.x) {
+                    score++;
+                }
+            }
+
+            // Display score
+            ctx.fillStyle = 'black';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, 10, 30);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' && !gameOver) {
+                bird.jump();
+            }
+            if (event.code === 'KeyR' && gameOver) {
+                startGame();
+            }
+        });
+
+        startGame();
+    </script>
 </body>
 </html>
