@@ -9,7 +9,7 @@
         body, html {
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            overflow: hidden;
             height: 100%;
             background-color: #70c5ce;
             font-family: 'Arial', sans-serif;
@@ -200,43 +200,6 @@
                 return;
             }
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            bird.update();
-            bird.render();
-
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
-                pipes.push(new Pipe());
-            }
-
-            for (let i = 0; i < pipes.length; i++) {
-                pipes[i].update();
-                pipes[i].render();
-                if (pipes[i].x <= bird.x + bird.width && pipes[i].x + pipes[i].width > bird.x) {
-                    if (bird.y < pipes[i].height || bird.y + bird.height > pipes[i].height + pipes[i].gap) {
-                        gameOver = true;
-                    }
-                }
-            }
-
-            ctx.fillStyle = 'black';
-            ctx.font = '20px Arial';
-            ctx.fillText('Score: ' + score, 10, 30);
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        canvas.addEventListener('click', function () {
-            if (!gameOver) bird.jump();
-        });
-
-        window.addEventListener('keydown', function (event) {
-            if (event.code === 'Space' && !gameOver) {
-                bird.jump();
-            }
-        });
-
-        startGame();
-    </script>
-</body>
-</html>
+            ctx.clearRect(0, 0, canvas.width, canvas.height
+::contentReference[oaicite:0]{index=0}
+ 
