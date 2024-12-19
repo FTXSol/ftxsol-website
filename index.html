@@ -3,76 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>#FTXSol Bird</title>
+    <title>$FTXSOL - The Comeback Meme Coin</title>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100%;
-            background-color: #70c5ce;
-            font-family: 'Arial', sans-serif;
-        }
-
-        canvas {
-            display: block;
-            margin: 0 auto;
-            background-color: #fff;
-        }
-
-        header, footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #70c5ce;
-            color: white;
-        }
-
-        section {
-            padding: 20px;
-        }
-
-        #game {
-            position: relative;
-            text-align: center;
-            margin: 20px auto;
-            width: 320px; /* Match the canvas width */
-            height: 480px; /* Match the canvas height */
-            background-color: #fff;
-            border: 2px solid #007bff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            z-index: 10;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-        }
-
-        .restart-btn {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-    </style>
 </head>
 <body>
     <header>
-        <h1>#FTXSol Bird</h1>
+        <h1>$FTXSOL</h1>
         <p>"Pump it, don’t dump it!"</p>
     </header>
 
@@ -80,6 +16,7 @@
         <h2>About $FTXSOL</h2>
         <img src="assets/images/ftxsollogoremove.png" alt="Token Logo" width="350" height="350" />
         <p>$FTXSOL is a meme coin built on Solana, symbolizing resilience and recovery in the crypto world. Join the movement and be part of the comeback story!</p>
+        
     </section>
 
     <section id="community">
@@ -88,156 +25,8 @@
         <a href="https://x.com/ftxsol_?s=21&t=i7a15TmSrjZUgzU8gYwxxg" target="_blank" class="btn">X</a>
     </section>
 
-    <section id="game">
-        <h2>Play #FTXSol Bird!</h2>
-        <div id="gameOverContainer" class="game-over">
-            <h2>Game Over!</h2>
-            <button class="restart-btn" onclick="startGame()">Restart</button>
-        </div>
-        <canvas id="gameCanvas"></canvas>
-    </section>
-
     <footer>
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
-
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 320;
-        canvas.height = 480;
-
-        let bird, pipes, gameSpeed, gravity, lift, gameOver, score;
-        const birdImage = new Image();
-        birdImage.src = 'assets/images/pixelated-baby-phoenix-sprite.png'; // Sprite sheet for phoenix
-
-        function Bird() {
-            this.x = 50;
-            this.y = canvas.height / 2;
-            this.width = 32; // Frame width from sprite sheet
-            this.height = 32; // Frame height from sprite sheet
-            this.velocity = 0;
-            this.lift = -4;
-            this.gravity = 0.2;
-
-            this.frame = 0;
-            this.frameCount = 3;
-            this.frameInterval = 6;
-            this.tick = 0;
-
-            this.update = function () {
-                this.velocity += this.gravity;
-                this.y += this.velocity;
-
-                if (this.y < 0) this.y = 0;
-                if (this.y + this.height > canvas.height) {
-                    this.y = canvas.height - this.height;
-                    gameOver = true;
-                }
-
-                this.tick++;
-                if (this.tick >= this.frameInterval) {
-                    this.frame = (this.frame + 1) % this.frameCount;
-                    this.tick = 0;
-                }
-            };
-
-            this.jump = function () {
-                this.velocity = this.lift;
-            };
-
-            this.render = function () {
-                ctx.drawImage(
-                    birdImage,
-                    this.frame * this.width,
-                    0,
-                    this.width,
-                    this.height,
-                    this.x,
-                    this.y,
-                    this.width,
-                    this.height
-                );
-            };
-        }
-
-        function Pipe() {
-            this.width = 40;
-            this.gap = 120;
-            this.x = canvas.width;
-            this.height = Math.floor(Math.random() * (canvas.height - this.gap));
-
-            this.update = function () {
-                this.x -= gameSpeed;
-                if (this.x + this.width < 0) {
-                    pipes.shift();
-                    score++;
-                }
-            };
-
-            this.render = function () {
-                ctx.fillStyle = '#008000';
-                ctx.fillRect(this.x, 0, this.width, this.height);
-                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - (this.height + this.gap));
-            };
-        }
-
-        function startGame() {
-            bird = new Bird();
-            pipes = [];
-            gameSpeed = 2;
-            gravity = 0.2;
-            lift = -4;
-            gameOver = false;
-            score = 0;
-            document.getElementById('gameOverContainer').style.display = 'none';
-            gameLoop();
-        }
-
-        function gameLoop() {
-            if (gameOver) {
-                document.getElementById('gameOverContainer').style.display = 'flex';
-                return;
-            }
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            bird.update();
-            bird.render();
-
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
-                pipes.push(new Pipe());
-            }
-
-            for (let i = 0; i < pipes.length; i++) {
-                pipes[i].update();
-                pipes[i].render();
-                if (pipes[i].x <= bird.x + bird.width && pipes[i].x + pipes[i].width > bird.x) {
-                    if (bird.y < pipes[i].height || bird.y + bird.height > pipes[i].height + pipes[i].gap) {
-                        gameOver = true;
-                    }
-                }
-            }
-
-            ctx.fillStyle = 'black';
-            ctx.font = '20px Arial';
-            ctx.fillText('Score: ' + score, 10, 30);
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        canvas.addEventListener('click', function () {
-            if (!gameOver) bird.jump();
-        });
-
-        window.addEventListener('keydown', function (event) {
-            if (event.code === 'Space' && !gameOver) {
-                bird.jump();
-            }
-        });
-
-        startGame();
-    </script>
 </body>
 </html>
-
