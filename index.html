@@ -5,6 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$FTXSOL - The Comeback Meme Coin</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        /* CSS for the Game Section */
+        #game {
+            margin: 0 auto;
+            width: 320px;
+            text-align: center;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: white;
+            border: 2px solid #000;
+        }
+
+        .game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .restart-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -16,7 +58,6 @@
         <h2>About $FTXSOL</h2>
         <img src="assets/images/ftxsollogoremove.png" alt="Token Logo" width="350" height="350" />
         <p>$FTXSOL is a meme coin built on Solana, symbolizing resilience and recovery in the crypto world. Join the movement and be part of the comeback story!</p>
-        
     </section>
 
     <section id="community">
@@ -25,8 +66,139 @@
         <a href="https://x.com/ftxsol_?s=21&t=i7a15TmSrjZUgzU8gYwxxg" target="_blank" class="btn">X</a>
     </section>
 
+    <section id="game">
+        <h2>Play #FTXSOL Bird!</h2>
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-over" id="gameOverMessage">
+            <p>Game Over!</p>
+            <button class="restart-btn" id="restartButton">Restart</button>
+        </div>
+    </section>
+
     <footer>
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 320;
+        canvas.height = 480;
+
+        const birdImage = new Image();
+        birdImage.src = 'assets/images/pixelated-baby-phoenix.png';
+
+        let bird, pipes, gameSpeed, score, gravity, lift, gameOver;
+
+        function Bird() {
+            this.x = 50;
+            this.y = canvas.height / 2;
+            this.width = 34; // Adjust as per the actual dimensions of your bird image
+            this.height = 24; // Adjust as per the actual dimensions of your bird image
+            this.velocity = 0;
+
+            this.update = function () {
+                this.velocity += gravity;
+                this.y += this.velocity;
+
+                // Prevent the bird from going out of bounds
+                if (this.y < 0) this.y = 0;
+                if (this.y + this.height > canvas.height) {
+                    this.y = canvas.height - this.height;
+                    gameOver = true;
+                }
+            };
+
+            this.jump = function () {
+                this.velocity = lift;
+            };
+
+            this.render = function () {
+                ctx.drawImage(birdImage, this.x, this.y, this.width, this.height);
+            };
+        }
+
+        function Pipe() {
+            this.width = 40;
+            this.gap = 100;
+            this.x = canvas.width;
+            this.height = Math.random() * (canvas.height - this.gap);
+
+            this.update = function () {
+                this.x -= gameSpeed;
+                if (this.x + this.width < 0) {
+                    pipes.shift(); // Remove pipes that move out of view
+                }
+            };
+
+            this.render = function () {
+                ctx.fillStyle = 'green';
+                ctx.fillRect(this.x, 0, this.width, this.height); // Top pipe
+                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - this.height - this.gap); // Bottom pipe
+            };
+        }
+
+        function startGame() {
+            bird = new Bird();
+            pipes = [];
+            gameSpeed = 2;
+            gravity = 0.2;
+            lift = -5;
+            gameOver = false;
+            score = 0;
+
+            document.getElementById('gameOverMessage').style.display = 'none';
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if (gameOver) {
+                document.getElementById('gameOverMessage').style.display = 'block';
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            bird.update();
+            bird.render();
+
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
+                pipes.push(new Pipe());
+            }
+
+            pipes.forEach(pipe => {
+                pipe.update();
+                pipe.render();
+
+                if (
+                    bird.x < pipe.x + pipe.width &&
+                    bird.x + bird.width > pipe.x &&
+                    (bird.y < pipe.height || bird.y + bird.height > pipe.height + pipe.gap)
+                ) {
+                    gameOver = true;
+                }
+            });
+
+            ctx.fillStyle = 'black';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, 10, 30);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('restartButton').addEventListener('click', () => {
+            startGame();
+        });
+
+        canvas.addEventListener('click', () => {
+            if (!gameOver) bird.jump();
+        });
+
+        window.addEventListener('keydown', event => {
+            if (event.code === 'Space') bird.jump();
+        });
+
+        startGame();
+    </script>
 </body>
 </html>
