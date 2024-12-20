@@ -21,8 +21,10 @@
     
     <section id="game">
         <h2>Play #FTXSOL Bird!</h2>
-        <button id="playButton" class="btn">Play Game</button>
-        <canvas id="gameCanvas"></canvas>
+        <div id="gameContainer" style="position: relative; width: 320px; margin: 0 auto;">
+            <button id="playButton" class="btn" style="position: absolute; top: 200px; left: 90px; z-index: 2;">Play Game</button>
+            <canvas id="gameCanvas" style="display: block; background-color: #f9f9f9;"></canvas>
+        </div>
         <div class="game-over" id="gameOverMessage" style="display: none;">
             <p>Game Over!</p>
             <p>Your Score: <span id="currentScore">0</span></p>
@@ -108,27 +110,6 @@
         }
 
         function startGame() {
-            playButton.style.display = 'none';
-            canvas.style.display = 'block';
-
-            // Show a countdown before the game starts
-            let countdown = 3;
-            const countdownInterval = setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'black';
-                ctx.font = '40px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(countdown, canvas.width / 2, canvas.height / 2);
-                countdown--;
-
-                if (countdown < 0) {
-                    clearInterval(countdownInterval);
-                    initializeGame(); // Start the game after countdown
-                }
-            }, 1000);
-        }
-
-        function initializeGame() {
             bird = new Bird();
             pipes = [];
             gameSpeed = 1.5;
@@ -136,7 +117,25 @@
             lift = -4;
             gameOver = false;
             score = 0;
-            gameLoop();
+
+            playButton.style.display = 'none';
+            canvas.style.display = 'block';
+            document.getElementById('gameOverMessage').style.display = 'none';
+            document.getElementById('highScoreForm').style.display = 'block';
+            document.getElementById('restartButton').style.display = 'none';
+
+            let countdown = 3;
+            const countdownInterval = setInterval(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'black';
+                ctx.font = '30px Arial';
+                ctx.fillText(`Starting in ${countdown}...`, 80, canvas.height / 2);
+                countdown--;
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    gameLoop();
+                }
+            }, 1000);
         }
 
         function gameLoop() {
@@ -199,7 +198,7 @@
         function displayHighScores() {
             const highScoresList = document.getElementById('highScoresList');
             const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-            
+
             highScoresList.innerHTML = '';
             for (let i = 0; i < 10; i++) {
                 const scoreEntry = highScores[i];
@@ -222,10 +221,6 @@
         });
 
         displayHighScores();
-
-        // Ensure the play button doesn't hide the canvas, only starts the game
-        canvas.style.display = 'block';
-        playButton.style.display = 'block';
     </script>
 </body>
 </html>
