@@ -6,6 +6,15 @@
     <title>$FTXSOL - The Comeback Meme Coin</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/game.css"> <!-- Game-specific styles -->
+    <style>
+        .game-over {
+            text-align: center;
+        }
+        #restartButton, #highScoreForm {
+            display: inline-block;
+            margin: 10px auto;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -50,11 +59,9 @@
     </footer>
 
     <script type="module">
-        // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
             authDomain: "ftxsol.firebaseapp.com",
@@ -66,11 +73,9 @@
             measurementId: "G-0ZVLGDTGM0"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // Game variables
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const playButton = document.getElementById('playButton');
@@ -78,6 +83,7 @@
         const highScoresList = document.getElementById('highScoresList');
         const playerNameInput = document.getElementById('playerName');
         const restartButton = document.getElementById('restartButton');
+        const highScoreForm = document.getElementById('highScoreForm');
 
         canvas.width = 320;
         canvas.height = 480;
@@ -116,7 +122,7 @@
 
         function Pipe() {
             this.width = 40;
-            this.gap = 180;
+            this.gap = 200;
             this.x = canvas.width;
             this.height = Math.random() * (canvas.height - this.gap);
 
@@ -148,6 +154,8 @@
             canvas.style.display = 'block';
             gameOverMessage.style.display = 'none';
             restartButton.style.display = 'none';
+            highScoreForm.style.display = 'block';
+            playerNameInput.value = '';
 
             gameLoop();
         }
@@ -171,39 +179,11 @@
                 pipe.update();
                 pipe.render();
 
-                // Adjusted hitboxes for accurate collision detection
-                const birdHitbox = {
-                    x: bird.x + 10, // Shrink hitbox on the left
-                    y: bird.y + 10, // Shrink hitbox on the top
-                    width: bird.width - 20, // Shrink hitbox on the right
-                    height: bird.height - 20 // Shrink hitbox on the bottom
-                };
-
-                const pipeHitboxTop = {
-                    x: pipe.x,
-                    y: 0,
-                    width: pipe.width,
-                    height: pipe.height
-                };
-
-                const pipeHitboxBottom = {
-                    x: pipe.x,
-                    y: pipe.height + pipe.gap,
-                    width: pipe.width,
-                    height: canvas.height - pipe.height - pipe.gap
-                };
-
-                const isCollidingWithTop = birdHitbox.x < pipeHitboxTop.x + pipeHitboxTop.width &&
-                                           birdHitbox.x + birdHitbox.width > pipeHitboxTop.x &&
-                                           birdHitbox.y < pipeHitboxTop.y + pipeHitboxTop.height &&
-                                           birdHitbox.y + birdHitbox.height > pipeHitboxTop.y;
-
-                const isCollidingWithBottom = birdHitbox.x < pipeHitboxBottom.x + pipeHitboxBottom.width &&
-                                              birdHitbox.x + birdHitbox.width > pipeHitboxBottom.x &&
-                                              birdHitbox.y < pipeHitboxBottom.y + pipeHitboxBottom.height &&
-                                              birdHitbox.y + birdHitbox.height > pipeHitboxBottom.y;
-
-                if (isCollidingWithTop || isCollidingWithBottom) {
+                if (
+                    bird.x < pipe.x + pipe.width &&
+                    bird.x + bird.width > pipe.x &&
+                    (bird.y < pipe.height || bird.y + bird.height > pipe.height + pipe.gap)
+                ) {
                     gameOver = true;
                 }
             });
