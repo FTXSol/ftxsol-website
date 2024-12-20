@@ -33,7 +33,7 @@
                 <input type="text" id="playerName" maxlength="10" placeholder="Your name" required />
                 <button type="submit">Save Score</button>
             </form>
-            <button class="restart-btn" id="restartButton" style="display: none;">Restart</button>
+            <button class="restart-btn" id="restartButton" style="display: none;">Play Again</button>
             <h3>Top 10 High Scores</h3>
             <ol id="highScoresList"></ol>
         </div>
@@ -50,11 +50,11 @@
     </footer>
 
     <script type="module">
-        // Import the Firebase modules you need
+        // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
             authDomain: "ftxsol.firebaseapp.com",
@@ -70,23 +70,25 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // Game Variables and Logic
+        // Game variables
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const playButton = document.getElementById('playButton');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const highScoresList = document.getElementById('highScoresList');
+        const playerNameInput = document.getElementById('playerName');
+        const restartButton = document.getElementById('restartButton');
+
         canvas.width = 320;
         canvas.height = 480;
-
-        const birdImage = new Image();
-        birdImage.src = 'assets/images/ftxsollogoremove.png';
 
         let bird, pipes, gameSpeed, score, gravity, lift, gameOver;
 
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 100;
-            this.height = 100;
+            this.width = 50;
+            this.height = 50;
             this.velocity = 0;
 
             this.update = function () {
@@ -105,13 +107,14 @@
             };
 
             this.render = function () {
-                ctx.drawImage(birdImage, this.x, this.y, this.width, this.height);
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(this.x, this.y, this.width, this.height);
             };
         }
 
         function Pipe() {
             this.width = 40;
-            this.gap = 220;
+            this.gap = 120;
             this.x = canvas.width;
             this.height = Math.random() * (canvas.height - this.gap);
 
@@ -133,7 +136,7 @@
         function startGame() {
             bird = new Bird();
             pipes = [];
-            gameSpeed = 1.5;
+            gameSpeed = 2;
             gravity = 0.15;
             lift = -4;
             gameOver = false;
@@ -141,22 +144,10 @@
 
             playButton.style.display = 'none';
             canvas.style.display = 'block';
-            document.getElementById('gameOverMessage').style.display = 'none';
-            document.getElementById('highScoreForm').style.display = 'block';
-            document.getElementById('restartButton').style.display = 'none';
+            gameOverMessage.style.display = 'none';
+            restartButton.style.display = 'none';
 
-            let countdown = 3;
-            const countdownInterval = setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'black';
-                ctx.font = '30px Arial';
-                ctx.fillText(`Starting in ${countdown}...`, 80, canvas.height / 2);
-                countdown--;
-                if (countdown < 0) {
-                    clearInterval(countdownInterval);
-                    gameLoop();
-                }
-            }, 1000);
+            gameLoop();
         }
 
         function gameLoop() {
@@ -195,63 +186,41 @@
         }
 
         function handleGameOver() {
-            document.getElementById('gameOverMessage').style.display = 'block';
+            gameOverMessage.style.display = 'block';
             document.getElementById('currentScore').innerText = score;
         }
 
-        // Save High Score Function
         function saveHighScore(event) {
             event.preventDefault();
 
-            const playerName = document.getElementById("playerName").value.trim() || "Anonymous";
-            const highScoreData = {
-                name: playerName,
-                score: parseInt(document.getElementById("currentScore").innerText) || 0,
-                timestamp: Date.now()
-            };
+            const playerName = playerNameInput.value.trim() || "Anonymous";
+            const scoresRef = ref(database, 'highScores');
+            push(scoresRef, { name: playerName, score });
 
-            const highScoresRef = ref(database, "highScores");
-            push(highScoresRef, highScoreData)
-                .then(() => {
-                    console.log("High score saved successfully");
-                    displayHighScores();
-                })
-                .catch(error => {
-                    console.error("Error saving high score:", error);
-                });
+            displayHighScores();
+            document.getElementById('highScoreForm').style.display = 'none';
+            restartButton.style.display = 'block';
         }
 
-        // Display High Scores Function
         function displayHighScores() {
-            const highScoresList = document.getElementById("highScoresList");
-            const highScoresRef = ref(database, "highScores");
+            const scoresRef = ref(database, 'highScores');
+            onValue(scoresRef, snapshot => {
+                const scores = snapshot.val();
+                const sortedScores = Object.values(scores || {}).sort((a, b) => b.score - a.score).slice(0, 10);
 
-            get(highScoresRef)
-                .then(snapshot => {
-                    const highScores = [];
-                    snapshot.forEach(childSnapshot => {
-                        highScores.push(childSnapshot.val());
-                    });
-                    highScores.sort((a, b) => b.score - a.score);
-
-                    highScoresList.innerHTML = highScores
-                        .slice(0, 10)
-                        .map(score => `<li>${score.name}: ${score.score}</li>`)
-                        .join("");
-                })
-                .catch(error => {
-                    console.error("Error retrieving high scores:", error);
+                highScoresList.innerHTML = '';
+                sortedScores.forEach(score => {
+                    highScoresList.innerHTML += `<li>${score.name}: ${score.score}</li>`;
                 });
+            });
         }
 
-        // Event Listeners
-        playButton.addEventListener("click", startGame);
-        document.addEventListener("keydown", e => {
-            if (e.key === " ") {
-                bird.jump();
-            }
-        });
-        document.getElementById("highScoreForm").addEventListener("submit", saveHighScore);
+        playButton.addEventListener('click', startGame);
+        canvas.addEventListener('click', () => !gameOver && bird.jump());
+        document.getElementById('highScoreForm').addEventListener('submit', saveHighScore);
+        restartButton.addEventListener('click', startGame);
+
+        displayHighScores();
     </script>
 </body>
 </html>
