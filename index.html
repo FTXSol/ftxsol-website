@@ -6,6 +6,15 @@
     <title>$FTXSOL - The Comeback Meme Coin</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/game.css"> <!-- Game-specific styles -->
+    <style>
+        .game-over {
+            text-align: center;
+        }
+        #restartButton, #highScoreForm {
+            display: inline-block;
+            margin: 10px auto;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -50,11 +59,9 @@
     </footer>
 
     <script type="module">
-        // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
             authDomain: "ftxsol.firebaseapp.com",
@@ -66,11 +73,9 @@
             measurementId: "G-0ZVLGDTGM0"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // Game variables
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const playButton = document.getElementById('playButton');
@@ -78,6 +83,7 @@
         const highScoresList = document.getElementById('highScoresList');
         const playerNameInput = document.getElementById('playerName');
         const restartButton = document.getElementById('restartButton');
+        const highScoreForm = document.getElementById('highScoreForm');
 
         canvas.width = 320;
         canvas.height = 480;
@@ -148,6 +154,8 @@
             canvas.style.display = 'block';
             gameOverMessage.style.display = 'none';
             restartButton.style.display = 'none';
+            highScoreForm.style.display = 'block';
+            playerNameInput.value = '';
 
             gameLoop();
         }
@@ -190,7 +198,7 @@
         function handleGameOver() {
             gameOverMessage.style.display = 'block';
             document.getElementById('currentScore').innerText = score;
-            restartButton.style.display = 'block'; // Ensure button is shown after every game.
+            restartButton.style.display = 'block';
         }
 
         function saveHighScore(event) {
@@ -201,7 +209,7 @@
             push(scoresRef, { name: playerName, score });
 
             displayHighScores();
-            document.getElementById('highScoreForm').style.display = 'none';
+            highScoreForm.style.display = 'none';
             restartButton.style.display = 'block';
         }
 
@@ -220,11 +228,10 @@
 
         playButton.addEventListener('click', startGame);
         canvas.addEventListener('click', () => !gameOver && bird.jump());
-        document.getElementById('highScoreForm').addEventListener('submit', saveHighScore);
+        highScoreForm.addEventListener('submit', saveHighScore);
         restartButton.addEventListener('click', startGame);
 
         displayHighScores();
     </script>
 </body>
 </html>
-
