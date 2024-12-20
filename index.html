@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,8 +21,9 @@
     
     <section id="game">
         <h2>Play #FTXSOL Bird!</h2>
-        <canvas id="gameCanvas"></canvas>
-        <div class="game-over" id="gameOverMessage">
+        <button id="playButton" class="btn">Play Game</button>
+        <canvas id="gameCanvas" style="display: none;"></canvas>
+        <div class="game-over" id="gameOverMessage" style="display: none;">
             <p>Game Over!</p>
             <p>Your Score: <span id="currentScore">0</span></p>
             <form id="highScoreForm">
@@ -49,6 +50,7 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const playButton = document.getElementById('playButton');
         canvas.width = 320;
         canvas.height = 480;
 
@@ -114,9 +116,11 @@
             gameOver = false;
             score = 0;
 
+            canvas.style.display = 'block';
             document.getElementById('gameOverMessage').style.display = 'none';
             document.getElementById('highScoreForm').style.display = 'block';
             document.getElementById('restartButton').style.display = 'none';
+            playButton.style.display = 'none';
             gameLoop();
         }
 
@@ -163,8 +167,8 @@
         function saveHighScore(event) {
             event.preventDefault();
 
-            const playerName = document.getElementById('playerName').value.trim();
-            if (!playerName) return;
+            let playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) playerName = "Anonymous";
 
             let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
             highScores.push({ name: playerName, score: score });
@@ -184,17 +188,15 @@
             highScoresList.innerHTML = '';
             for (let i = 0; i < 10; i++) {
                 const scoreEntry = highScores[i];
-                const name = scoreEntry ? scoreEntry.name : 'N/A';
-                const score = scoreEntry ? scoreEntry.score : '---';
+                const name = scoreEntry ? scoreEntry.name : 'Anonymous';
+                const score = scoreEntry ? scoreEntry.score : '0';
                 highScoresList.innerHTML += `<li>${name}: ${score}</li>`;
             }
         }
 
+        document.getElementById('playButton').addEventListener('click', startGame);
         document.getElementById('highScoreForm').addEventListener('submit', saveHighScore);
-
-        document.getElementById('restartButton').addEventListener('click', () => {
-            startGame();
-        });
+        document.getElementById('restartButton').addEventListener('click', startGame);
 
         canvas.addEventListener('click', () => {
             if (!gameOver) bird.jump();
@@ -204,7 +206,6 @@
             if (event.code === 'Space') bird.jump();
         });
 
-        startGame();
         displayHighScores();
     </script>
 </body>
