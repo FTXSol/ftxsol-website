@@ -122,7 +122,7 @@
 
         function Pipe() {
             this.width = 40;
-            this.gap = 225;
+            this.gap = 210;
             this.x = canvas.width;
             this.height = Math.random() * (canvas.height - this.gap);
 
@@ -144,7 +144,7 @@
         function startGame() {
             bird = new Bird();
             pipes = [];
-            gameSpeed = 2;
+            gameSpeed = 2.5;
             gravity = 0.15;
             lift = -4;
             gameOver = false;
