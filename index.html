@@ -91,8 +91,8 @@
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 34; // Adjust as per the actual dimensions of your bird image
-            this.height = 24; // Adjust as per the actual dimensions of your bird image
+            this.width = 50; // Adjust as per the actual dimensions of your bird image
+            this.height = 50; // Adjust as per the actual dimensions of your bird image
             this.velocity = 0;
 
             this.update = function () {
@@ -118,7 +118,7 @@
 
         function Pipe() {
             this.width = 40;
-            this.gap = 100;
+            this.gap = 120;
             this.x = canvas.width;
             this.height = Math.random() * (canvas.height - this.gap);
 
