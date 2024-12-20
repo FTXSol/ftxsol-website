@@ -103,6 +103,7 @@
             score = 0;
 
             document.getElementById('gameOverMessage').style.display = 'none';
+            document.getElementById('highScoreForm').style.display = 'block';
             document.getElementById('restartButton').style.display = 'none';
             gameLoop();
         }
@@ -167,9 +168,15 @@
         function displayHighScores() {
             const highScoresList = document.getElementById('highScoresList');
             const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-            highScoresList.innerHTML = highScores
-                .map(entry => `<li>${entry.name}: ${entry.score}</li>`)
-                .join('');
+            
+            // Make sure to always show 10 entries even if there are fewer high scores
+            highScoresList.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const scoreEntry = highScores[i];
+                const name = scoreEntry ? scoreEntry.name : 'N/A';
+                const score = scoreEntry ? scoreEntry.score : '---';
+                highScoresList.innerHTML += `<li>${name}: ${score}</li>`;
+            }
         }
 
         document.getElementById('highScoreForm').addEventListener('submit', saveHighScore);
