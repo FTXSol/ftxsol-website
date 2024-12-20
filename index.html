@@ -13,6 +13,12 @@
         <p>"Pump it, don’t dump it!"</p>
     </header>
 
+    <section id="about">
+        <h2>About $FTXSOL</h2>
+        <img src="assets/images/ftxsollogoremove.png" alt="Token Logo" width="350" height="350" />
+        <p>$FTXSOL is a meme coin built on Solana, symbolizing resilience and recovery in the crypto world. Join the movement and be part of the comeback story!</p>
+    </section>
+    
     <section id="game">
         <h2>Play #FTXSOL Bird!</h2>
         <canvas id="gameCanvas"></canvas>
@@ -29,7 +35,13 @@
             <ol id="highScoresList"></ol>
         </div>
     </section>
-
+    
+    <section id="community">
+        <h2>Join the Community</h2>
+        <a href="https://t.me/+0WdyS7CWtdo0NTk5" target="_blank" class="btn">Telegram</a>
+        <a href="https://x.com/ftxsol_?s=21&t=i7a15TmSrjZUgzU8gYwxxg" target="_blank" class="btn">X</a>
+    </section>
+    
     <footer>
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
@@ -169,7 +181,6 @@
             const highScoresList = document.getElementById('highScoresList');
             const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
             
-            // Make sure to always show 10 entries even if there are fewer high scores
             highScoresList.innerHTML = '';
             for (let i = 0; i < 10; i++) {
                 const scoreEntry = highScores[i];
