@@ -10,25 +10,53 @@
     <header>
         <h1>$FTXSOL</h1>
         <p>"Pump it, don’t dump it!"</p>
+        <nav>
+            <ul>
+                <li><a href="#game">Play</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#high-scores">High Scores</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <section id="game">
-        <h2>Play #FTXSOL Bird!</h2>
-        <div id="gameContainer" style="position: relative; width: 320px; margin: 0 auto;">
-            <button id="playButton" class="btn" style="position: absolute; top: 200px; left: 90px; z-index: 2;">Play Game</button>
-            <canvas id="gameCanvas" style="display: block; background-color: #f9f9f9;"></canvas>
-        </div>
-        <div class="game-over" id="gameOverMessage" style="display: none;">
-            <p>Game Over!</p>
-            <p>Your Score: <span id="currentScore">0</span></p>
-            <form id="highScoreForm">
-                <label for="playerName">Enter your name:</label>
-                <input type="text" id="playerName" maxlength="10" placeholder="Your name" required />
-                <button type="submit">Save Score</button>
-            </form>
-            <button class="restart-btn" id="restartButton">Restart</button>
-        </div>
-    </section>
+    <main>
+        <!-- Game Section -->
+        <section id="game">
+            <h2>Play #FTXSOL Bird!</h2>
+            <div id="gameContainer" style="position: relative; width: 320px; margin: 0 auto;">
+                <button id="playButton" class="btn" style="position: absolute; top: 200px; left: 90px; z-index: 2;">Play Game</button>
+                <canvas id="gameCanvas" style="display: block; background-color: #f9f9f9;"></canvas>
+            </div>
+            <div class="game-over" id="gameOverMessage" style="display: none;">
+                <p>Game Over!</p>
+                <p>Your Score: <span id="currentScore">0</span></p>
+                <form id="highScoreForm">
+                    <label for="playerName">Enter your name:</label>
+                    <input type="text" id="playerName" maxlength="10" placeholder="Your name" required />
+                    <button type="submit">Save Score</button>
+                </form>
+                <button class="restart-btn" id="restartButton">Restart</button>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <h2>About $FTXSOL</h2>
+            <p>$FTXSOL is the comeback meme coin that combines the best of blockchain technology and community-driven fun. Play our game, compete with friends, and showcase your high scores!</p>
+        </section>
+
+        <!-- High Scores Section -->
+        <section id="high-scores">
+            <h2>High Scores</h2>
+            <ul id="scoreList">
+                <!-- High scores will be dynamically loaded here -->
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 $FTXSOL. All rights reserved.</p>
+    </footer>
 
     <script type="module">
         // Import Firebase SDKs
@@ -59,6 +87,7 @@
         const restartButton = document.getElementById('restartButton');
         const currentScoreEl = document.getElementById('currentScore');
         const playerNameInput = document.getElementById('playerName');
+        const scoreList = document.getElementById('scoreList');
 
         canvas.width = 320;
         canvas.height = 480;
@@ -182,6 +211,24 @@
             await push(scoresRef, { name: playerName, score });
             alert('Score saved successfully!');
         });
+
+        // Load high scores
+        async function loadHighScores() {
+            const scoresRef = ref(database, 'scores');
+            const snapshot = await get(scoresRef);
+            const scores = snapshot.val() || {};
+
+            // Display scores
+            scoreList.innerHTML = '';
+            Object.values(scores).sort((a, b) => b.score - a.score).forEach(({ name, score }) => {
+                const li = document.createElement('li');
+                li.textContent = `${name}: ${score}`;
+                scoreList.appendChild(li);
+            });
+        }
+
+        // Load high scores on page load
+        loadHighScores();
 
         // Event listeners
         playButton.addEventListener('click', startGame);
