@@ -24,7 +24,11 @@
         <canvas id="gameCanvas"></canvas>
         <div class="game-over" id="gameOverMessage">
             <p>Game Over!</p>
+            <p>Your Score: <span id="currentScore">0</span></p>
             <button class="restart-btn" id="restartButton">Restart</button>
+            <h3>Top 10 High Scores</h3>
+            <ol id="highScoresList"></ol>
+            <button class="share-btn" id="shareButton">Share Your Score</button>
         </div>
         <div id="instructions">
             <p><strong>Instructions:</strong></p>
@@ -117,7 +121,7 @@
 
         function gameLoop() {
             if (gameOver) {
-                document.getElementById('gameOverMessage').style.display = 'block';
+                handleGameOver();
                 return;
             }
 
@@ -150,8 +154,35 @@
             requestAnimationFrame(gameLoop);
         }
 
+        function handleGameOver() {
+            document.getElementById('gameOverMessage').style.display = 'block';
+            document.getElementById('currentScore').innerText = score;
+            updateHighScores(score);
+            displayHighScores();
+        }
+
+        function updateHighScores(newScore) {
+            let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+            highScores.push(newScore);
+            highScores.sort((a, b) => b - a);
+            highScores = highScores.slice(0, 10);
+            localStorage.setItem('highScores', JSON.stringify(highScores));
+        }
+
+        function displayHighScores() {
+            const highScoresList = document.getElementById('highScoresList');
+            const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+            highScoresList.innerHTML = highScores.map(score => `<li>${score}</li>`).join('');
+        }
+
         document.getElementById('restartButton').addEventListener('click', () => {
             startGame();
+        });
+
+        document.getElementById('shareButton').addEventListener('click', () => {
+            const shareText = `I scored ${score} playing #FTXSOL Bird! Can you beat me? 🐦🚀`;
+            const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+            window.open(shareUrl, '_blank');
         });
 
         canvas.addEventListener('click', () => {
