@@ -49,19 +49,19 @@
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase SDKs -->
     <script type="module">
-        // Import the functions you need from the SDKs
+        // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getDatabase, ref, push, query, orderByChild, limitToLast, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Firebase Configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
             authDomain: "ftxsol.firebaseapp.com",
             projectId: "ftxsol",
             databaseURL: "https://ftxsol-default-rtdb.firebaseio.com",
-            storageBucket: "ftxsol.firebasestorage.app",
+            storageBucket: "ftxsol.appspot.com",
             messagingSenderId: "90196404818",
             appId: "1:90196404818:web:a9266e059fb8838b548d8b",
             measurementId: "G-0ZVLGDTGM0"
@@ -70,8 +70,9 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+    </script>
 
-        // Game Logic
+    <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const playButton = document.getElementById('playButton');
@@ -204,16 +205,20 @@
             event.preventDefault();
 
             const playerName = document.getElementById('playerName').value.trim() || "Anonymous";
+
             const newScoreRef = push(ref(database, 'highScores'));
-            newScoreRef.set({
+            set(newScoreRef, {
                 name: playerName,
                 score: score,
                 timestamp: Date.now()
+            })
+            .then(() => {
+                console.log("Score saved successfully!");
+                displayHighScores();
+            })
+            .catch((error) => {
+                console.error("Error saving score:", error);
             });
-
-            displayHighScores();
-            document.getElementById('highScoreForm').style.display = 'none';
-            document.getElementById('restartButton').style.display = 'block';
         }
 
         function displayHighScores() {
@@ -228,22 +233,13 @@
 
                 scores.sort((a, b) => b.score - a.score);
                 highScoresList.innerHTML = scores.map(entry => `<li>${entry.name}: ${entry.score}</li>`).join('');
+            }).catch(error => {
+                console.error("Error loading scores:", error);
             });
         }
 
-        document.getElementById('playButton').addEventListener('click', startGame);
+        playButton.addEventListener('click', startGame);
         document.getElementById('highScoreForm').addEventListener('submit', saveHighScore);
-        document.getElementById('restartButton').addEventListener('click', startGame);
-
-        canvas.addEventListener('click', () => {
-            if (!gameOver) bird.jump();
-        });
-
-        window.addEventListener('keydown', event => {
-            if (event.code === 'Space') bird.jump();
-        });
-
-        displayHighScores();
     </script>
 </body>
 </html>
