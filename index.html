@@ -4,56 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$FTXSOL - The Comeback Meme Coin</title>
-    <style>
-        /* CSS for the Game Section */
-        #game {
-            margin: 0 auto;
-            width: 320px;
-            text-align: center;
-            position: relative;
-        }
-
-        canvas {
-            display: block;
-            margin: 0 auto;
-            background-color: white;
-            border: 2px solid #000;
-        }
-
-        .game-over {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 10;
-        }
-
-        .restart-btn {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        #instructions {
-            margin-top: 20px;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            color: #555;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/game.css"> <!-- Game-specific styles -->
 </head>
 <body>
     <header>
@@ -76,7 +28,7 @@
         </div>
         <div id="instructions">
             <p><strong>Instructions:</strong></p>
-            <p>Click or press the <strong>Spacebar</strong> to make the bird jump.</p>
+            <p>Tap the screen or press the <strong>Spacebar</strong> to make the bird jump.</p>
             <p>Avoid the pipes and try to get the highest score possible!</p>
         </div>
     </section>
@@ -105,7 +57,7 @@
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 75; 
+            this.width = 75;
             this.height = 75;
             this.velocity = 0;
 
@@ -131,7 +83,7 @@
 
         function Pipe() {
             this.width = 40;
-            this.gap = 200;
+            this.gap = 220;
             this.x = canvas.width;
             this.height = Math.random() * (canvas.height - this.gap);
 
@@ -139,6 +91,7 @@
                 this.x -= gameSpeed;
                 if (this.x + this.width < 0) {
                     pipes.shift();
+                    score++;
                 }
             };
 
@@ -152,9 +105,9 @@
         function startGame() {
             bird = new Bird();
             pipes = [];
-            gameSpeed = 2;
-            gravity = 0.2;
-            lift = -5;
+            gameSpeed = 1.5;
+            gravity = 0.15;
+            lift = -4;
             gameOver = false;
             score = 0;
 
