@@ -13,19 +13,13 @@
         <p>"Pump it, don’t dump it!"</p>
     </header>
 
-    <section id="about">
-        <h2>About $FTXSOL</h2>
-        <img src="assets/images/ftxsollogoremove.png" alt="Token Logo" width="350" height="350" />
-        <p>$FTXSOL is a meme coin built on Solana, symbolizing resilience and recovery in the crypto world. Join the movement and be part of the comeback story!</p>
-    </section>
-    
     <section id="game">
         <h2>Play #FTXSOL Bird!</h2>
         <canvas id="gameCanvas"></canvas>
         <div class="game-over" id="gameOverMessage">
             <p>Game Over!</p>
             <p>Your Score: <span id="currentScore">0</span></p>
-            <form id="highScoreForm" style="display: none;">
+            <form id="highScoreForm">
                 <label for="playerName">Enter your name:</label>
                 <input type="text" id="playerName" maxlength="10" placeholder="Your name" required />
                 <button type="submit">Save Score</button>
@@ -33,21 +27,9 @@
             <button class="restart-btn" id="restartButton" style="display: none;">Restart</button>
             <h3>Top 10 High Scores</h3>
             <ol id="highScoresList"></ol>
-            <button class="share-btn" id="shareButton" style="display: none;">Share Your Score</button>
-        </div>
-        <div id="instructions">
-            <p><strong>Instructions:</strong></p>
-            <p>Tap the screen or press the <strong>Spacebar</strong> to make the bird jump.</p>
-            <p>Avoid the pipes and try to get the highest score possible!</p>
         </div>
     </section>
-    
-    <section id="community">
-        <h2>Join the Community</h2>
-        <a href="https://t.me/+0WdyS7CWtdo0NTk5" target="_blank" class="btn">Telegram</a>
-        <a href="https://x.com/ftxsol_?s=21&t=i7a15TmSrjZUgzU8gYwxxg" target="_blank" class="btn">X</a>
-    </section>
-    
+
     <footer>
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
@@ -121,9 +103,7 @@
             score = 0;
 
             document.getElementById('gameOverMessage').style.display = 'none';
-            document.getElementById('highScoreForm').style.display = 'none';
             document.getElementById('restartButton').style.display = 'none';
-            document.getElementById('shareButton').style.display = 'none';
             gameLoop();
         }
 
@@ -165,7 +145,6 @@
         function handleGameOver() {
             document.getElementById('gameOverMessage').style.display = 'block';
             document.getElementById('currentScore').innerText = score;
-            document.getElementById('highScoreForm').style.display = 'block';
         }
 
         function saveHighScore(event) {
@@ -183,7 +162,6 @@
             displayHighScores();
             document.getElementById('highScoreForm').style.display = 'none';
             document.getElementById('restartButton').style.display = 'block';
-            document.getElementById('shareButton').style.display = 'block';
         }
 
         function displayHighScores() {
@@ -198,12 +176,6 @@
 
         document.getElementById('restartButton').addEventListener('click', () => {
             startGame();
-        });
-
-        document.getElementById('shareButton').addEventListener('click', () => {
-            const shareText = `I scored ${score} playing #FTXSOL Bird! Can you beat me? 🐦🚀`;
-            const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-            window.open(shareUrl, '_blank');
         });
 
         canvas.addEventListener('click', () => {
