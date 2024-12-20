@@ -6,27 +6,6 @@
     <title>$FTXSOL - The Comeback Meme Coin</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/game.css"> <!-- Game-specific styles -->
-    <script type="module">
-        // Firebase Initialization
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
-            authDomain: "ftxsol.firebaseapp.com",
-            databaseURL: "https://ftxsol-default-rtdb.firebaseio.com/",
-            projectId: "ftxsol",
-            storageBucket: "ftxsol.appspot.com",
-            messagingSenderId: "90196404818",
-            appId: "1:90196404818:web:a9266e059fb8838b548d8b",
-            measurementId: "G-0ZVLGDTGM0"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        window.firebaseConfig = { database }; // Expose database globally
-    </script>
 </head>
 <body>
     <header>
@@ -70,7 +49,28 @@
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
 
-    <script>
+    <script type="module">
+        // Import the Firebase modules you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
+            authDomain: "ftxsol.firebaseapp.com",
+            databaseURL: "https://ftxsol-default-rtdb.firebaseio.com",
+            projectId: "ftxsol",
+            storageBucket: "ftxsol.appspot.com",
+            messagingSenderId: "90196404818",
+            appId: "1:90196404818:web:a9266e059fb8838b548d8b",
+            measurementId: "G-0ZVLGDTGM0"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Game Variables and Logic
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const playButton = document.getElementById('playButton');
@@ -199,52 +199,59 @@
             document.getElementById('currentScore').innerText = score;
         }
 
+        // Save High Score Function
         function saveHighScore(event) {
             event.preventDefault();
 
-            let playerName = document.getElementById('playerName').value.trim();
-            if (!playerName) playerName = "Anonymous";
-
-            const { database } = window.firebaseConfig;
-            const highScoresRef = ref(database, 'highScores');
-
-            push(highScoresRef, {
+            const playerName = document.getElementById("playerName").value.trim() || "Anonymous";
+            const highScoreData = {
                 name: playerName,
-                score: score,
+                score: parseInt(document.getElementById("currentScore").innerText) || 0,
                 timestamp: Date.now()
-            });
+            };
 
-            displayHighScores();
-            document.getElementById('highScoreForm').style.display = 'none';
-            document.getElementById('restartButton').style.display = 'block';
+            const highScoresRef = ref(database, "highScores");
+            push(highScoresRef, highScoreData)
+                .then(() => {
+                    console.log("High score saved successfully");
+                    displayHighScores();
+                })
+                .catch(error => {
+                    console.error("Error saving high score:", error);
+                });
         }
 
+        // Display High Scores Function
         function displayHighScores() {
-            const highScoresList = document.getElementById('highScoresList');
-            const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+            const highScoresList = document.getElementById("highScoresList");
+            const highScoresRef = ref(database, "highScores");
 
-            highScoresList.innerHTML = '';
-            for (let i = 0; i < 10; i++) {
-                const scoreEntry = highScores[i];
-                const name = scoreEntry ? scoreEntry.name : 'Anonymous';
-                const score = scoreEntry ? scoreEntry.score : '0';
-                highScoresList.innerHTML += `<li>${name}: ${score}</li>`;
-            }
+            get(highScoresRef)
+                .then(snapshot => {
+                    const highScores = [];
+                    snapshot.forEach(childSnapshot => {
+                        highScores.push(childSnapshot.val());
+                    });
+                    highScores.sort((a, b) => b.score - a.score);
+
+                    highScoresList.innerHTML = highScores
+                        .slice(0, 10)
+                        .map(score => `<li>${score.name}: ${score.score}</li>`)
+                        .join("");
+                })
+                .catch(error => {
+                    console.error("Error retrieving high scores:", error);
+                });
         }
 
-        document.getElementById('playButton').addEventListener('click', startGame);
-        document.getElementById('highScoreForm').addEventListener('submit', saveHighScore);
-        document.getElementById('restartButton').addEventListener('click', startGame);
-
-        canvas.addEventListener('click', () => {
-            if (!gameOver) bird.jump();
+        // Event Listeners
+        playButton.addEventListener("click", startGame);
+        document.addEventListener("keydown", e => {
+            if (e.key === " ") {
+                bird.jump();
+            }
         });
-
-        window.addEventListener('keydown', event => {
-            if (event.code === 'Space') bird.jump();
-        });
-
-        displayHighScores();
+        document.getElementById("highScoreForm").addEventListener("submit", saveHighScore);
     </script>
 </body>
 </html>
