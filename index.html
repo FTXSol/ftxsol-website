@@ -179,11 +179,39 @@
                 pipe.update();
                 pipe.render();
 
-                if (
-                    bird.x < pipe.x + pipe.width &&
-                    bird.x + bird.width > pipe.x &&
-                    (bird.y < pipe.height || bird.y + bird.height > pipe.height + pipe.gap)
-                ) {
+                // Adjusted hitboxes for accurate collision detection
+                const birdHitbox = {
+                    x: bird.x + 10, // Shrink hitbox on the left
+                    y: bird.y + 10, // Shrink hitbox on the top
+                    width: bird.width - 20, // Shrink hitbox on the right
+                    height: bird.height - 20 // Shrink hitbox on the bottom
+                };
+
+                const pipeHitboxTop = {
+                    x: pipe.x,
+                    y: 0,
+                    width: pipe.width,
+                    height: pipe.height
+                };
+
+                const pipeHitboxBottom = {
+                    x: pipe.x,
+                    y: pipe.height + pipe.gap,
+                    width: pipe.width,
+                    height: canvas.height - pipe.height - pipe.gap
+                };
+
+                const isCollidingWithTop = birdHitbox.x < pipeHitboxTop.x + pipeHitboxTop.width &&
+                                           birdHitbox.x + birdHitbox.width > pipeHitboxTop.x &&
+                                           birdHitbox.y < pipeHitboxTop.y + pipeHitboxTop.height &&
+                                           birdHitbox.y + birdHitbox.height > pipeHitboxTop.y;
+
+                const isCollidingWithBottom = birdHitbox.x < pipeHitboxBottom.x + pipeHitboxBottom.width &&
+                                              birdHitbox.x + birdHitbox.width > pipeHitboxBottom.x &&
+                                              birdHitbox.y < pipeHitboxBottom.y + pipeHitboxBottom.height &&
+                                              birdHitbox.y + birdHitbox.height > pipeHitboxBottom.y;
+
+                if (isCollidingWithTop || isCollidingWithBottom) {
                     gameOver = true;
                 }
             });
