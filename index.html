@@ -25,10 +25,15 @@
         <div class="game-over" id="gameOverMessage">
             <p>Game Over!</p>
             <p>Your Score: <span id="currentScore">0</span></p>
-            <button class="restart-btn" id="restartButton">Restart</button>
+            <form id="highScoreForm" style="display: none;">
+                <label for="playerName">Enter your name:</label>
+                <input type="text" id="playerName" maxlength="10" placeholder="Your name" required />
+                <button type="submit">Save Score</button>
+            </form>
+            <button class="restart-btn" id="restartButton" style="display: none;">Restart</button>
             <h3>Top 10 High Scores</h3>
             <ol id="highScoresList"></ol>
-            <button class="share-btn" id="shareButton">Share Your Score</button>
+            <button class="share-btn" id="shareButton" style="display: none;">Share Your Score</button>
         </div>
         <div id="instructions">
             <p><strong>Instructions:</strong></p>
@@ -116,6 +121,9 @@
             score = 0;
 
             document.getElementById('gameOverMessage').style.display = 'none';
+            document.getElementById('highScoreForm').style.display = 'none';
+            document.getElementById('restartButton').style.display = 'none';
+            document.getElementById('shareButton').style.display = 'none';
             gameLoop();
         }
 
@@ -157,23 +165,36 @@
         function handleGameOver() {
             document.getElementById('gameOverMessage').style.display = 'block';
             document.getElementById('currentScore').innerText = score;
-            updateHighScores(score);
-            displayHighScores();
+            document.getElementById('highScoreForm').style.display = 'block';
         }
 
-        function updateHighScores(newScore) {
+        function saveHighScore(event) {
+            event.preventDefault();
+
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) return;
+
             let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-            highScores.push(newScore);
-            highScores.sort((a, b) => b - a);
+            highScores.push({ name: playerName, score: score });
+            highScores.sort((a, b) => b.score - a.score);
             highScores = highScores.slice(0, 10);
             localStorage.setItem('highScores', JSON.stringify(highScores));
+
+            displayHighScores();
+            document.getElementById('highScoreForm').style.display = 'none';
+            document.getElementById('restartButton').style.display = 'block';
+            document.getElementById('shareButton').style.display = 'block';
         }
 
         function displayHighScores() {
             const highScoresList = document.getElementById('highScoresList');
             const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-            highScoresList.innerHTML = highScores.map(score => `<li>${score}</li>`).join('');
+            highScoresList.innerHTML = highScores
+                .map(entry => `<li>${entry.name}: ${entry.score}</li>`)
+                .join('');
         }
+
+        document.getElementById('highScoreForm').addEventListener('submit', saveHighScore);
 
         document.getElementById('restartButton').addEventListener('click', () => {
             startGame();
@@ -194,6 +215,7 @@
         });
 
         startGame();
+        displayHighScores();
     </script>
 </body>
 </html>
