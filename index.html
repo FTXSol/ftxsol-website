@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$FTXSOL - The Comeback Meme Coin</title>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/game.css"> <!-- Game-specific styles -->
 </head>
 <body>
     <header>
@@ -13,12 +12,6 @@
         <p>"Pump it, don’t dump it!"</p>
     </header>
 
-    <section id="about">
-        <h2>About $FTXSOL</h2>
-        <img src="assets/images/ftxsollogoremove.png" alt="Token Logo" width="350" height="350" />
-        <p>$FTXSOL is a meme coin built on Solana, symbolizing resilience and recovery in the crypto world. Join the movement and be part of the comeback story!</p>
-    </section>
-    
     <section id="game">
         <h2>Play #FTXSOL Bird!</h2>
         <div id="gameContainer" style="position: relative; width: 320px; margin: 0 auto;">
@@ -33,28 +26,16 @@
                 <input type="text" id="playerName" maxlength="10" placeholder="Your name" required />
                 <button type="submit">Save Score</button>
             </form>
-            <button class="restart-btn" id="restartButton" style="display: none;">Restart</button>
-            <h3>Top 10 High Scores</h3>
-            <ol id="highScoresList"></ol>
+            <button class="restart-btn" id="restartButton">Restart</button>
         </div>
     </section>
-    
-    <section id="community">
-        <h2>Join the Community</h2>
-        <a href="https://t.me/+0WdyS7CWtdo0NTk5" target="_blank" class="btn">Telegram</a>
-        <a href="https://x.com/ftxsol_?s=21&t=i7a15TmSrjZUgzU8gYwxxg" target="_blank" class="btn">X</a>
-    </section>
-    
-    <footer>
-        <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
-    </footer>
 
     <script type="module">
-        // Import the functions you need from the SDKs you need
+        // Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Your web app's Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
             authDomain: "ftxsol.firebaseapp.com",
@@ -63,72 +44,34 @@
             storageBucket: "ftxsol.appspot.com",
             messagingSenderId: "90196404818",
             appId: "1:90196404818:web:a9266e059fb8838b548d8b",
-            measurementId: "G-0ZVLGDTGM0"
         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // Function to save scores
-        window.saveHighScore = async (event) => {
-            event.preventDefault();
-            const playerName = document.getElementById('playerName').value.trim() || 'Anonymous';
-            const scoreRef = ref(database, 'scores');
-            try {
-                await push(scoreRef, {
-                    name: playerName,
-                    score: parseInt(document.getElementById('currentScore').innerText, 10),
-                });
-                console.log('Score saved successfully!');
-                displayHighScores();
-                document.getElementById('highScoreForm').style.display = 'none';
-                document.getElementById('restartButton').style.display = 'block';
-            } catch (error) {
-                console.error('Error saving score:', error);
-            }
-        };
-
-        // Function to display high scores
-        async function displayHighScores() {
-            const scoreRef = ref(database, 'scores');
-            try {
-                const scoresSnapshot = await get(scoreRef);
-                const scores = scoresSnapshot.exists() ? Object.values(scoresSnapshot.val()) : [];
-                scores.sort((a, b) => b.score - a.score);
-
-                const highScoresList = document.getElementById('highScoresList');
-                highScoresList.innerHTML = scores.slice(0, 10).map(score => `<li>${score.name}: ${score.score}</li>`).join('');
-            } catch (error) {
-                console.error('Error fetching high scores:', error);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            displayHighScores();
-
-            const highScoreForm = document.getElementById('highScoreForm');
-            highScoreForm.addEventListener('submit', saveHighScore);
-        });
-    </script>
-
-    <script>
+        // DOM Elements
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const playButton = document.getElementById('playButton');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const highScoreForm = document.getElementById('highScoreForm');
+        const restartButton = document.getElementById('restartButton');
+        const currentScoreEl = document.getElementById('currentScore');
+        const playerNameInput = document.getElementById('playerName');
+
         canvas.width = 320;
         canvas.height = 480;
 
-        const birdImage = new Image();
-        birdImage.src = 'assets/images/ftxsollogoremove.png';
-
+        // Game variables
         let bird, pipes, gameSpeed, score, gravity, lift, gameOver;
 
+        // Bird object
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 100;
-            this.height = 100;
+            this.width = 20;
+            this.height = 20;
             this.velocity = 0;
 
             this.update = function () {
@@ -147,13 +90,15 @@
             };
 
             this.render = function () {
-                ctx.drawImage(birdImage, this.x, this.y, this.width, this.height);
+                ctx.fillStyle = "blue";
+                ctx.fillRect(this.x, this.y, this.width, this.height);
             };
         }
 
+        // Pipe object
         function Pipe() {
             this.width = 40;
-            this.gap = 220;
+            this.gap = 150;
             this.x = canvas.width;
             this.height = Math.random() * (canvas.height - this.gap);
 
@@ -166,41 +111,30 @@
             };
 
             this.render = function () {
-                ctx.fillStyle = 'green';
+                ctx.fillStyle = "green";
                 ctx.fillRect(this.x, 0, this.width, this.height);
                 ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - this.height - this.gap);
             };
         }
 
+        // Start the game
         function startGame() {
             bird = new Bird();
             pipes = [];
-            gameSpeed = 1.5;
-            gravity = 0.15;
-            lift = -4;
-            gameOver = false;
+            gameSpeed = 2;
+            gravity = 0.2;
+            lift = -5;
             score = 0;
+            gameOver = false;
 
             playButton.style.display = 'none';
             canvas.style.display = 'block';
-            document.getElementById('gameOverMessage').style.display = 'none';
-            document.getElementById('highScoreForm').style.display = 'block';
-            document.getElementById('restartButton').style.display = 'none';
+            gameOverMessage.style.display = 'none';
 
-            let countdown = 3;
-            const countdownInterval = setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'black';
-                ctx.font = '30px Arial';
-                ctx.fillText(`Starting in ${countdown}...`, 80, canvas.height / 2);
-                countdown--;
-                if (countdown < 0) {
-                    clearInterval(countdownInterval);
-                    gameLoop();
-                }
-            }, 1000);
+            gameLoop();
         }
 
+        // Main game loop
         function gameLoop() {
             if (gameOver) {
                 handleGameOver();
@@ -220,6 +154,7 @@
                 pipe.update();
                 pipe.render();
 
+                // Collision detection
                 if (
                     bird.x < pipe.x + pipe.width &&
                     bird.x + bird.width > pipe.x &&
@@ -229,30 +164,29 @@
                 }
             });
 
-            ctx.fillStyle = 'black';
-            ctx.font = '20px Arial';
-            ctx.fillText(`Score: ${score}`, 10, 30);
-
-            if (!gameOver) {
-                requestAnimationFrame(gameLoop);
-            }
+            requestAnimationFrame(gameLoop);
         }
 
+        // Handle game over
         function handleGameOver() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'black';
-            ctx.font = '30px Arial';
-            ctx.fillText('Game Over!', 90, canvas.height / 2 - 20);
-            ctx.fillText(`Final Score: ${score}`, 90, canvas.height / 2 + 20);
-
-            document.getElementById('currentScore').innerText = score;
-            document.getElementById('gameOverMessage').style.display = 'block';
+            canvas.style.display = 'none';
+            gameOverMessage.style.display = 'block';
+            currentScoreEl.textContent = score;
         }
 
-        playButton.addEventListener('click', startGame);
-        window.addEventListener('keydown', (event) => {
-            if (event.key === ' ') bird.jump();
+        // Save high score to Firebase
+        highScoreForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const playerName = playerNameInput.value || "Anonymous";
+            const scoresRef = ref(database, 'scores');
+            await push(scoresRef, { name: playerName, score });
+            alert('Score saved successfully!');
         });
+
+        // Event listeners
+        playButton.addEventListener('click', startGame);
+        canvas.addEventListener('click', () => bird.jump());
+        restartButton.addEventListener('click', () => location.reload());
     </script>
 </body>
 </html>
