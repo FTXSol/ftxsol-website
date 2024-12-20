@@ -82,13 +82,16 @@
         canvas.width = 320;
         canvas.height = 480;
 
+        const birdImage = new Image();
+        birdImage.src = 'assets/images/ftxsollogoremove.png';
+
         let bird, pipes, gameSpeed, score, gravity, lift, gameOver;
 
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 50;
-            this.height = 50;
+            this.width = 100;
+            this.height = 100;
             this.velocity = 0;
 
             this.update = function () {
@@ -107,8 +110,7 @@
             };
 
             this.render = function () {
-                ctx.fillStyle = 'yellow';
-                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.drawImage(birdImage, this.x, this.y, this.width, this.height);
             };
         }
 
@@ -188,6 +190,7 @@
         function handleGameOver() {
             gameOverMessage.style.display = 'block';
             document.getElementById('currentScore').innerText = score;
+            restartButton.style.display = 'block'; // Ensure button is shown after every game.
         }
 
         function saveHighScore(event) {
@@ -224,3 +227,4 @@
     </script>
 </body>
 </html>
+
