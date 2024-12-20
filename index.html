@@ -49,7 +49,29 @@
         <p>© 2024 $FTXSOL - The Comeback Meme Coin. Built with love and memes.</p>
     </footer>
 
-    <script>
+    <!-- Firebase Scripts -->
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, push, query, orderByChild, limitToLast, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkMdcoQJohuFq1TxQmzI9rUEVwtPeXXcM",
+            authDomain: "ftxsol.firebaseapp.com",
+            projectId: "ftxsol",
+            databaseURL: "https://ftxsol-default-rtdb.firebaseio.com",
+            storageBucket: "ftxsol.firebasestorage.app",
+            messagingSenderId: "90196404818",
+            appId: "1:90196404818:web:a9266e059fb8838b548d8b",
+            measurementId: "G-0ZVLGDTGM0"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Game Logic
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const playButton = document.getElementById('playButton');
@@ -181,14 +203,13 @@
         function saveHighScore(event) {
             event.preventDefault();
 
-            let playerName = document.getElementById('playerName').value.trim();
-            if (!playerName) playerName = "Anonymous";
-
-            let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-            highScores.push({ name: playerName, score: score });
-            highScores.sort((a, b) => b.score - a.score);
-            highScores = highScores.slice(0, 10);
-            localStorage.setItem('highScores', JSON.stringify(highScores));
+            const playerName = document.getElementById('playerName').value.trim() || "Anonymous";
+            const newScoreRef = push(ref(database, 'highScores'));
+            newScoreRef.set({
+                name: playerName,
+                score: score,
+                timestamp: Date.now()
+            });
 
             displayHighScores();
             document.getElementById('highScoreForm').style.display = 'none';
@@ -197,15 +218,17 @@
 
         function displayHighScores() {
             const highScoresList = document.getElementById('highScoresList');
-            const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+            const scoresQuery = query(ref(database, 'highScores'), orderByChild('score'), limitToLast(10));
 
-            highScoresList.innerHTML = '';
-            for (let i = 0; i < 10; i++) {
-                const scoreEntry = highScores[i];
-                const name = scoreEntry ? scoreEntry.name : 'Anonymous';
-                const score = scoreEntry ? scoreEntry.score : '0';
-                highScoresList.innerHTML += `<li>${name}: ${score}</li>`;
-            }
+            get(scoresQuery).then(snapshot => {
+                const scores = [];
+                snapshot.forEach(childSnapshot => {
+                    scores.push(childSnapshot.val());
+                });
+
+                scores.sort((a, b) => b.score - a.score);
+                highScoresList.innerHTML = scores.map(entry => `<li>${entry.name}: ${entry.score}</li>`).join('');
+            });
         }
 
         document.getElementById('playButton').addEventListener('click', startGame);
