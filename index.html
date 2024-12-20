@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$FTXSOL - The Comeback Meme Coin</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
     <style>
         /* CSS for the Game Section */
         #game {
@@ -46,6 +45,14 @@
             cursor: pointer;
             font-size: 16px;
         }
+
+        #instructions {
+            margin-top: 20px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -59,6 +66,7 @@
         <img src="assets/images/ftxsollogoremove.png" alt="Token Logo" width="350" height="350" />
         <p>$FTXSOL is a meme coin built on Solana, symbolizing resilience and recovery in the crypto world. Join the movement and be part of the comeback story!</p>
     </section>
+    
     <section id="game">
         <h2>Play #FTXSOL Bird!</h2>
         <canvas id="gameCanvas"></canvas>
@@ -66,7 +74,13 @@
             <p>Game Over!</p>
             <button class="restart-btn" id="restartButton">Restart</button>
         </div>
+        <div id="instructions">
+            <p><strong>Instructions:</strong></p>
+            <p>Click or press the <strong>Spacebar</strong> to make the bird jump.</p>
+            <p>Avoid the pipes and try to get the highest score possible!</p>
+        </div>
     </section>
+    
     <section id="community">
         <h2>Join the Community</h2>
         <a href="https://t.me/+0WdyS7CWtdo0NTk5" target="_blank" class="btn">Telegram</a>
@@ -91,15 +105,14 @@
         function Bird() {
             this.x = 50;
             this.y = canvas.height / 2;
-            this.width = 75; // Adjust as per the actual dimensions of your bird image
-            this.height = 75; // Adjust as per the actual dimensions of your bird image
+            this.width = 75; 
+            this.height = 75;
             this.velocity = 0;
 
             this.update = function () {
                 this.velocity += gravity;
                 this.y += this.velocity;
 
-                // Prevent the bird from going out of bounds
                 if (this.y < 0) this.y = 0;
                 if (this.y + this.height > canvas.height) {
                     this.y = canvas.height - this.height;
@@ -125,14 +138,14 @@
             this.update = function () {
                 this.x -= gameSpeed;
                 if (this.x + this.width < 0) {
-                    pipes.shift(); // Remove pipes that move out of view
+                    pipes.shift();
                 }
             };
 
             this.render = function () {
                 ctx.fillStyle = 'green';
-                ctx.fillRect(this.x, 0, this.width, this.height); // Top pipe
-                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - this.height - this.gap); // Bottom pipe
+                ctx.fillRect(this.x, 0, this.width, this.height);
+                ctx.fillRect(this.x, this.height + this.gap, this.width, canvas.height - this.height - this.gap);
             };
         }
 
